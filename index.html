@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="ko" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Culinary Coach: Interactive Strategy Report</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Warm Harmony -->
+    <!-- Application Structure Plan: The application is structured as a narrative "Project Proposal Flow" rather than mirroring the report's academic sections. The flow is: 1. The Vision (hook), 2. The Opportunity (problem/market gap), 3. The Solution (how it works), 4. The Plan (roadmap). This narrative structure is more engaging and intuitive for a web-based, interactive experience, guiding the user from the high-level concept down to the implementation details logically. A sticky navigation bar allows non-linear exploration. -->
+    <!-- Visualization & Content Choices: 
+        - Report Info: Competitive Landscape (Table 1) -> Goal: Compare -> Viz: Interactive HTML Table -> Interaction: Hover highlight -> Justification: Presents dense comparative data clearly and improves scannability.
+        - Report Info: Core AI Technology (Section 2) -> Goal: Organize/Explain -> Viz: HTML/CSS Flowchart Diagram -> Interaction: Static Visual -> Justification: Simplifies the complex, multi-model AI architecture ('committee' metaphor) into an easily digestible visual flow, enhancing comprehension.
+        - Report Info: Development Roadmap (Section 4) -> Goal: Show Change/Progression -> Viz: Interactive Tabbed Timeline -> Interaction: Click to reveal stage details -> Justification: Breaks down the long-term plan into manageable phases, encouraging user interaction and focused reading.
+        - Report Info: Roadmap Complexity (Table 3) -> Goal: Compare -> Viz: Bar Chart (Chart.js) -> Interaction: Hover for tooltips -> Justification: Provides a quick, quantitative visual summary of the effort required for each development stage, complementing the qualitative timeline.
+        - CONFIRMATION: NO SVG graphics used. NO Mermaid JS used.
+    -->
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #F8F5F2;
+            color: #3D352E;
+        }
+        .nav-link {
+            transition: color 0.3s, border-bottom-color 0.3s;
+            border-bottom: 2px solid transparent;
+        }
+        .nav-link.active, .nav-link:hover {
+            color: #E87A5D;
+            border-bottom-color: #E87A5D;
+        }
+        .card {
+            background-color: #FFFFFF;
+            border: 1px solid #EAE0D5;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .btn-primary {
+            background-color: #E87A5D;
+            color: #FFFFFF;
+            transition: background-color 0.3s;
+        }
+        .btn-primary:hover {
+            background-color: #D96A4D;
+        }
+        .btn-secondary {
+            background-color: #5D8B8B;
+            color: #FFFFFF;
+            transition: background-color 0.3s;
+        }
+        .btn-secondary:hover {
+            background-color: #4C7A7A;
+        }
+        .roadmap-tab {
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .roadmap-tab.active {
+            background-color: #E87A5D;
+            color: #FFFFFF;
+        }
+        .chart-container {
+            position: relative; 
+            width: 100%; 
+            max-width: 600px; 
+            margin-left: auto; 
+            margin-right: auto; 
+            height: 300px;
+            max-height: 400px;
+        }
+         @media (min-width: 768px) { 
+            .chart-container { 
+                height: 350px; 
+            } 
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="overflow-x-hidden">
+
+    <header id="header" class="bg-white/80 backdrop-blur-lg sticky top-0 z-50 shadow-sm">
+        <nav class="container mx-auto px-6 py-3 flex justify-between items-center">
+            <a href="#hero" class="text-xl font-bold text-[#3D352E]">AI Culinary Coach</a>
+            <div class="hidden md:flex space-x-8">
+                <a href="#vision" class="nav-link py-1">비전</a>
+                <a href="#opportunity" class="nav-link py-1">시장 기회</a>
+                <a href="#solution" class="nav-link py-1">핵심 솔루션</a>
+                <a href="#roadmap" class="nav-link py-1">개발 로드맵</a>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section id="hero" class="py-20 md:py-32 bg-white">
+            <div class="container mx-auto px-6 text-center">
+                <h1 class="text-4xl md:text-6xl font-bold text-[#3D352E] mb-4">AI 컬리너리 코치</h1>
+                <p class="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto">실시간 시각적 피드백 기반 요리 실습 앱 개발을 위한 대화형 전략 보고서</p>
+            </div>
+        </section>
+
+        <section id="vision" class="py-16 md:py-24">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-4xl font-bold">우리의 비전: 새로운 요리 패러다임</h2>
+                    <p class="mt-4 text-gray-600 max-w-2xl mx-auto">단순히 레시피를 따르는 것을 넘어, AI 코치와 함께 기술을 연마하는 양방향 경험을 제공합니다. 우리는 '수동적 지시'를 '능동적 코칭'으로 전환하고자 합니다.</p>
+                </div>
+                <div class="grid md:grid-cols-2 gap-8 items-center">
+                    <div class="card p-8 rounded-lg">
+                        <div class="text-2xl mb-4">🍳</div>
+                        <h3 class="text-2xl font-bold mb-3">기존 방식: 수동적 지시</h3>
+                        <p class="text-gray-600">전문가의 시연 VOD를 보고 일방적으로 따라 합니다. 자신의 동작이 올바른지, 레시피의 미묘한 뉘앙스를 제대로 구현하는지 알 수 없어 답답함을 느낍니다.</p>
+                    </div>
+                    <div class="card p-8 rounded-lg border-2 border-[#E87A5D]">
+                        <div class="text-2xl mb-4">🤖</div>
+                        <h3 class="text-2xl font-bold mb-3">AI 코치: 능동적 코칭</h3>
+                        <p class="text-gray-600">AI가 사용자의 칼질, 재료 상태를 실시간으로 분석하여 "손가락을 더 마세요" 또는 "이 레시피에는 더 잘게 다져야 해요"와 같이 개인화된 피드백을 즉시 제공합니다.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="opportunity" class="py-16 md:py-24 bg-white">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-4xl font-bold">시장의 '지도 공백' 발견</h2>
+                    <p class="mt-4 text-gray-600 max-w-2xl mx-auto">현재 시장은 레시피 추천과 같은 정보 제공 기능은 성숙했지만, 실시간 기술 코칭이라는 영역에는 명백한 공백이 존재합니다. 이것이 우리의 기회입니다.</p>
+                </div>
+
+                <div class="card rounded-lg p-6 overflow-x-auto">
+                    <h3 class="text-2xl font-bold mb-6 text-center">AI 기반 컬리너리 도구 경쟁 분석</h3>
+                    <table class="w-full min-w-[800px] text-left">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="p-4 font-semibold">제품명</th>
+                                <th class="p-4 font-semibold">주요 기능</th>
+                                <th class="p-4 font-semibold">핵심 AI 기술</th>
+                                <th class="p-4 font-semibold">핵심 한계점</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y">
+                            <tr class="hover:bg-gray-50">
+                                <td class="p-4 font-medium">ChefGPT, Cook AI</td>
+                                <td class="p-4">레시피 생성, 식단 계획</td>
+                                <td class="p-4">LLM 기반 텍스트 생성</td>
+                                <td class="p-4 text-red-600">실시간 지도 부재, 요리 중 상호작용 없음</td>
+                            </tr>
+                            <tr class="hover:bg-gray-50">
+                                <td class="p-4 font-medium">GE Kitchen Hub</td>
+                                <td class="p-4">스마트 오븐 가이드</td>
+                                <td class="p-4">내장 카메라 AI (익힘 감지)</td>
+                                <td class="p-4 text-red-600">고가의 특정 하드웨어 필요, 제한된 기능</td>
+                            </tr>
+                             <tr class="hover:bg-gray-50">
+                                <td class="p-4 font-medium">upliance.ai</td>
+                                <td class="p-4">자동 요리 기기</td>
+                                <td class="p-4">자동 제어 알고리즘</td>
+                                <td class="p-4 text-red-600">고가의 특정 하드웨어 필요, 수동 기술 학습 불가</td>
+                            </tr>
+                            <tr class="bg-[#E87A5D]/10">
+                                <td class="p-4 font-bold">제안된 앱 (AI 코치)</td>
+                                <td class="p-4 font-bold">실시간 요리 기술 코칭</td>
+                                <td class="p-4 font-bold">실시간 객체/행동 인식, VLM</td>
+                                <td class="p-4 text-green-600 font-bold">'지도 공백'을 해결하는 독보적 가치</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                 <p class="mt-6 text-center text-sm text-gray-500">대부분의 앱은 '무엇을 만들까'라는 요리 전 단계에 집중합니다. 우리는 '어떻게 잘 만들까'라는 요리 중 단계의 문제를 해결하여 새로운 시장을 창출합니다.</p>
+            </div>
+        </section>
+
+        <section id="solution" class="py-16 md:py-24">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-4xl font-bold">AI 코치의 작동 원리</h2>
+                    <p class="mt-4 text-gray-600 max-w-2xl mx-auto">AI 코치는 단일 AI가 아닌, 각자의 전문 분야를 가진 AI 모델들이 협력하는 '위원회'와 같습니다. 모든 핵심 과정은 사용자의 기기 안에서 실시간으로 처리되어 속도와 프라이버시를 보장합니다.</p>
+                </div>
+
+                <div class="flex flex-col md:flex-row justify-center items-center gap-4 md:gap-0 p-8 card rounded-xl">
+                    <div class="text-center p-4">
+                        <div class="text-4xl">📱</div>
+                        <p class="font-bold mt-2">카메라 입력</p>
+                        <p class="text-sm text-gray-500">실시간 비디오</p>
+                    </div>
+                    <div class="text-4xl text-gray-300 transform rotate-90 md:rotate-0">→</div>
+                     <div class="bg-white rounded-lg p-6 text-center shadow-inner">
+                        <p class="font-bold text-lg mb-2">온디바이스 AI 처리</p>
+                        <div class="flex flex-col md:flex-row gap-4 items-center">
+                            <div class="text-center p-4">
+                                <div class="text-4xl">👁️</div>
+                                <p class="font-bold mt-2">CV (눈)</p>
+                                <p class="text-sm text-gray-500">객체/행동 인식</p>
+                            </div>
+                             <div class="text-2xl text-gray-300 transform rotate-90 md:rotate-0">+</div>
+                            <div class="text-center p-4">
+                                <div class="text-4xl">🧠</div>
+                                <p class="font-bold mt-2">VLM (두뇌)</p>
+                                <p class="text-sm text-gray-500">상황 판단/피드백 생성</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-4xl text-gray-300 transform rotate-90 md:rotate-0">→</div>
+                    <div class="text-center p-4">
+                        <div class="text-4xl">💬</div>
+                        <p class="font-bold mt-2">실시간 피드백</p>
+                        <p class="text-sm text-gray-500">음성/텍스트/UI</p>
+                    </div>
+                </div>
+
+                <div class="mt-16">
+                    <h3 class="text-2xl font-bold mb-6 text-center">핵심 기술과 과제</h3>
+                    <div class="grid md:grid-cols-3 gap-8">
+                        <div class="card p-6 rounded-lg">
+                            <h4 class="font-bold text-lg mb-2 text-[#5D8B8B]">컴퓨터 비전 (CV)</h4>
+                            <p class="text-sm text-gray-600">재료, 도구를 넘어 '다지기', '채썰기' 등 세분화된 행동과 '물이 끓는' 상태 변화까지 인식해야 합니다. 가려짐, 조명 변화 등 주방의 복잡한 환경 극복이 과제입니다.</p>
+                        </div>
+                        <div class="card p-6 rounded-lg">
+                            <h4 class="font-bold text-lg mb-2 text-[#5D8B8B]">비전-언어 모델 (VLM)</h4>
+                            <p class="text-sm text-gray-600">CV가 '본' 시각 정보와 레시피의 요구사항을 비교하여, 자연스러운 언어로 된 코칭 메시지를 생성합니다. 실시간 스트리밍 상호작용이 핵심 기술 난제입니다.</p>
+                        </div>
+                        <div class="card p-6 rounded-lg">
+                            <h4 class="font-bold text-lg mb-2 text-[#5D8B8B]">온디바이스 최적화</h4>
+                            <p class="text-sm text-gray-600">복잡한 AI 모델들을 모바일 기기에서 빠르고 효율적으로 실행해야 합니다. 모델 경량화 기술(양자화 등)을 통해 성능과 프라이버시를 동시에 확보합니다.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="roadmap" class="py-16 md:py-24 bg-white">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-4xl font-bold">단계별 개발 로드맵</h2>
+                    <p class="mt-4 text-gray-600 max-w-2xl mx-auto">거대한 비전을 관리 가능한 단계로 나누어, 리스크를 줄이고 각 단계마다 명확한 가치를 제공하며 프로젝트를 점진적으로 완성해나갑니다.</p>
+                </div>
+                
+                <div class="flex flex-col md:flex-row justify-center mb-8 border-b">
+                    <button class="roadmap-tab py-3 px-6 text-lg font-medium border-b-2 border-transparent active" data-tab="1">1단계: MVP</button>
+                    <button class="roadmap-tab py-3 px-6 text-lg font-medium border-b-2 border-transparent" data-tab="2">2단계: 기술 코치</button>
+                    <button class="roadmap-tab py-3 px-6 text-lg font-medium border-b-2 border-transparent" data-tab="3">3단계: 플랫폼</button>
+                </div>
+
+                <div id="roadmap-content" class="fade-in">
+                    <!-- Content will be injected here by JS -->
+                </div>
+                
+                <div class="mt-16">
+                     <h3 class="text-2xl font-bold mb-6 text-center">단계별 예상 복잡도</h3>
+                    <div class="chart-container">
+                        <canvas id="complexityChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+    
+    <footer class="bg-gray-800 text-white py-8">
+        <div class="container mx-auto px-6 text-center">
+             <h3 class="text-xl font-bold mb-4">최종 전략 권고</h3>
+             <div class="grid md:grid-cols-3 gap-8 text-left max-w-5xl mx-auto">
+                 <div class="bg-gray-700 p-4 rounded-lg">
+                    <h4 class="font-bold mb-2">1. '기술 개발' 틈새시장 공략</h4>
+                    <p class="text-sm text-gray-300">단순 레시피 앱이 아닌, 혁신적인 '기술 습득 도구'로 포지셔닝해야 합니다.</p>
+                 </div>
+                 <div class="bg-gray-700 p-4 rounded-lg">
+                    <h4 class="font-bold mb-2">2. 데이터 확보 최우선</h4>
+                    <p class="text-sm text-gray-300">고품질 요리 비디오 데이터가 AI 성능의 핵심입니다. 공개 데이터셋 활용 및 합성 데이터 생성을 계획해야 합니다.</p>
+                 </div>
+                 <div class="bg-gray-700 p-4 rounded-lg">
+                    <h4 class="font-bold mb-2">3. MVP는 단일 플랫폼 집중</h4>
+                    <p class="text-sm text-gray-300">iOS 또는 Android 중 하나에 집중하여 기술적 리스크를 먼저 해소한 후 확장해야 합니다.</p>
+                 </div>
+             </div>
+             <p class="mt-8 text-sm text-gray-400">&copy; 2025 AI Culinary Coach Strategy. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const sections = document.querySelectorAll('main section[id]');
+            const navLinks = document.querySelectorAll('.nav-link');
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        navLinks.forEach(link => {
+                            link.classList.toggle('active', link.getAttribute('href').substring(1) === entry.target.id);
+                        });
+                    }
+                });
+            }, { rootMargin: '-50% 0px -50% 0px' });
+
+            sections.forEach(section => {
+                observer.observe(section);
+            });
+            
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const targetId = link.getAttribute('href');
+                    document.querySelector(targetId).scrollIntoView({ behavior: 'smooth' });
+                });
+            });
+
+            const roadmapData = {
+                1: {
+                    title: '1단계 - 최소 기능 제품(MVP): "절차 확인기"',
+                    goal: "핵심 기술 파이프라인의 실현 가능성을 검증합니다.",
+                    features: [
+                        "하나의 간단한 레시피 (예: 스크램블 에그)",
+                        "주요 단계 진행 상황 추적 (예: 계란 투입 확인)",
+                        "절차적 확인 위주의 간단한 피드백"
+                    ],
+                    tech: "기본 객체 탐지 및 상태 인식. 복잡한 행동 인식은 미포함.",
+                    success: "레시피 순서를 90% 이상 정확도로 식별."
+                },
+                2: {
+                    title: '2단계 - 핵심 혁신: "기술 코치"',
+                    goal: "앱의 핵심 차별화 요소인 세분화된 행동 피드백 기능을 도입합니다.",
+                    features: [
+                        "3~5개의 기술 기반 레시피 (예: 다지기)",
+                        "제한된 종류의 행동에 대한 실시간 교정 피드백",
+                        "예: '채썰기 시 손가락을 더 마세요.'"
+                    ],
+                    tech: "최초의 맞춤형 '세분화된 행동 인식' 모델 훈련 및 배포. VLM 미세 조정 시작.",
+                    success: "AI 피드백이 정확하고 건설적이라고 평가받음."
+                },
+                3: {
+                    title: '3단계 - 플랫폼 확장: "컬리너리 아카데미"',
+                    goal: "콘텐츠와 AI 능력을 확장하여 포괄적인 학습 플랫폼으로 발전시킵니다.",
+                    features: [
+                        "50개 이상의 레시피 및 코칭 기술",
+                        "사용자별 기술 향상도 추적 프로필",
+                        "핸즈프리 제어를 위한 음성 상호작용"
+                    ],
+                    tech: "콘텐츠 추가/AI 훈련 자동화 파이프라인 구축. 사용자 수준에 맞는 개인화 AI.",
+                    success: "높은 사용자 유지율 및 참여도 달성."
+                }
+            };
+            
+            const roadmapTabs = document.querySelectorAll('.roadmap-tab');
+            const roadmapContent = document.getElementById('roadmap-content');
+            
+            function updateRoadmapContent(tabId) {
+                const data = roadmapData[tabId];
+                roadmapContent.innerHTML = `
+                    <div class="card p-8 rounded-lg max-w-4xl mx-auto">
+                        <h3 class="text-2xl font-bold mb-4">${data.title}</h3>
+                        <p class="text-gray-700 mb-6"><strong class="text-[#E87A5D]">목표:</strong> ${data.goal}</p>
+                        <div class="grid md:grid-cols-2 gap-6 text-left">
+                            <div>
+                                <h4 class="font-bold text-lg mb-2">주요 기능</h4>
+                                <ul class="list-disc list-inside text-gray-600 space-y-1">
+                                    ${data.features.map(f => `<li>${f}</li>`).join('')}
+                                </ul>
+                            </div>
+                             <div>
+                                <h4 class="font-bold text-lg mb-2">기술 초점</h4>
+                                <p class="text-gray-600 mb-4">${data.tech}</p>
+                                <h4 class="font-bold text-lg mb-2">성공 지표</h4>
+                                <p class="text-gray-600">${data.success}</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                roadmapContent.classList.remove('fade-in');
+                void roadmapContent.offsetWidth;
+                roadmapContent.classList.add('fade-in');
+            }
+            
+            roadmapTabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    roadmapTabs.forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    updateRoadmapContent(tab.dataset.tab);
+                });
+            });
+
+            updateRoadmapContent('1');
+
+            const ctx = document.getElementById('complexityChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['1단계: MVP', '2단계: 기술 코치', '3단계: 플랫폼'],
+                    datasets: [{
+                        label: '예상 복잡도',
+                        data: [2, 5, 9],
+                        backgroundColor: [
+                            'rgba(93, 139, 139, 0.6)',
+                            'rgba(232, 122, 93, 0.6)',
+                            'rgba(217, 106, 77, 0.8)'
+                        ],
+                        borderColor: [
+                             '#5D8B8B',
+                            '#E87A5D',
+                            '#D96A4D'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 10,
+                             ticks: {
+                                stepSize: 2
+                            },
+                             grid: {
+                                color: 'rgba(0,0,0,0.05)'
+                            }
+                        },
+                        x: {
+                             grid: {
+                                display: false
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                             callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed.y !== null) {
+                                        label += context.parsed.y + ' / 10';
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
